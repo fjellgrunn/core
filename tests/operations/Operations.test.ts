@@ -30,9 +30,9 @@ describe('Operations Type Guards', () => {
       expect(isComKey(priKey)).toBe(false);
     });
 
-    it('should reject key with empty loc array', () => {
+    it('should treat key with empty loc array as composite', () => {
       const key = { kt: 'user', pk: 'user-123', loc: [] };
-      expect(isComKey(key)).toBe(false);
+      expect(isComKey(key)).toBe(true);
     });
   });
 });

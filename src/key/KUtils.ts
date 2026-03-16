@@ -13,12 +13,12 @@ const logger = LibLogger.get('KUtils');
 // Re-export type guards with more robust runtime checks for any input
 export const isComKey = (key: any): key is ComKey<any, any, any, any, any, any> => {
   return key !== null && typeof key === 'object' &&
-    'kt' in key && 'pk' in key && 'loc' in key && Array.isArray(key.loc) && key.loc.length > 0;
+    'kt' in key && 'pk' in key && 'loc' in key && Array.isArray(key.loc);
 };
 
 export const isPriKey = (key: any): key is PriKey<any> => {
   return key !== null && typeof key === 'object' &&
-    'kt' in key && 'pk' in key && (!('loc' in key) || !key.loc || (Array.isArray(key.loc) && key.loc.length === 0));
+    'kt' in key && 'pk' in key && (!('loc' in key) || key.loc === undefined || key.loc === null);
 };
 
 // Normalize a key value to string for consistent comparison and hashing
