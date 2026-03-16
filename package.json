@@ -36,9 +36,9 @@
     "docs:test": "cd docs && npm run test"
   },
   "dependencies": {
-    "@fjell/logging": "^4.4.71",
-    "@fjell/types": "^4.4.8",
-    "@fjell/validation": "^4.4.5",
+    "@fjell/logging": "^4.4.72",
+    "@fjell/types": "^4.4.9",
+    "@fjell/validation": "^4.4.6",
     "deepmerge": "^4.3.1",
     "luxon": "^3.7.2"
   },
