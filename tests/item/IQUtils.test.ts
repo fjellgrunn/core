@@ -52,6 +52,15 @@ describe('Testing IQUtils', () => {
       expect(params).toStrictEqual(expected);
     });
 
+    test('testing query with limit 0 and offset 0 round-trip', () => {
+      const query: ItemQuery = { limit: 0, offset: 0 };
+      const params: QueryParams = queryToParams(query);
+      expect(params).toStrictEqual({ limit: 0, offset: 0 });
+      const roundTrip = paramsToQuery(params);
+      expect(roundTrip.limit).toBe(0);
+      expect(roundTrip.offset).toBe(0);
+    });
+
     test('testing query with prop', () => {
       const query: ItemQuery = {
         compoundCondition: {
@@ -496,6 +505,22 @@ describe('Testing IQUtils', () => {
         const result = isQueryMatch(reflessItem, query);
         expect(result).toBe(false);
       });
+
+      test('testing ref query with mixed string/number pk', () => {
+        const mixedItem: Item<'test'> = {
+          key: { kt: 'test', pk: '2-2-2-2-2' },
+          events: {
+            created: { at: nowDate },
+            deleted: { at: null },
+            updated: { at: nowDate },
+          },
+          refs: {
+            turbo: { key: { kt: 'profile', pk: 123 as any } },
+          }
+        };
+        const query: ItemQuery = IQFactory.pk('profile', '123', 'turbo').toQuery();
+        expect(isQueryMatch(mixedItem, query)).toBe(true);
+      });
     });
 
     describe('Testing prop query match', () => {
@@ -637,6 +662,29 @@ describe('Testing IQUtils', () => {
         const result = isQueryMatch(item, query);
         expect(result).toBe(false);
       });
+
+      test('testing events query fails when item has no events', () => {
+        const noEventsItem: Item<'test'> = {
+          key: { kt: 'test', pk: '2-2-2-2-2' },
+        } as any;
+        const query: ItemQuery = IQFactory.event('created', {
+          start: luxon.DateTime.fromJSDate(nowDate).minus({ days: 1 }).toJSDate(),
+        }).toQuery();
+        expect(isQueryMatch(noEventsItem, query)).toBe(false);
+      });
+
+      test('testing events match does not skip aggs evaluation', () => {
+        const query: ItemQuery = {
+          ...IQFactory.event('created', {
+            start: luxon.DateTime.fromJSDate(nowDate).minus({ days: 1 }).toJSDate(),
+            end: luxon.DateTime.fromJSDate(nowDate).plus({ days: 1 }).toJSDate(),
+          }).toQuery(),
+          aggs: {
+            tested: IQFactory.conditions([{ column: 'hello', value: 'nope', operator: '==' }]).toQuery()
+          }
+        };
+        expect(isQueryMatch(item, query)).toBe(false);
+      });
     });
 
     describe('Testing agg query match', () => {
@@ -672,6 +720,48 @@ describe('Testing IQUtils', () => {
             IQFactory.conditions([{ column: 'hello', value: "world", operator: '==' }]).toQuery()).toQuery();
         const result = isQueryMatch(agglessItem, query);
         expect(result).toBe(false);
+      });
+
+      test('testing flattened agg (no nested .item) matches', () => {
+        const flatItem: Item<'test'> = {
+          key: { kt: 'test', pk: '2-2-2-2-2' },
+          events: {
+            created: { at: nowDate },
+            deleted: { at: null },
+            updated: { at: nowDate },
+          },
+          aggs: {
+            tested: [{
+              key: { kt: 'test', pk: '9-9-9-9-9' },
+              hello: 'world',
+            }] as any
+          }
+        };
+        const query: ItemQuery =
+          IQFactory.agg('tested',
+            IQFactory.conditions([{ column: 'hello', value: "world", operator: '==' }]).toQuery()).toQuery();
+        expect(isQueryMatch(flatItem, query)).toBe(true);
+      });
+
+      test('testing cardinality-one agg object is iterable', () => {
+        const oneAggItem: Item<'test'> = {
+          key: { kt: 'test', pk: '2-2-2-2-2' },
+          events: {
+            created: { at: nowDate },
+            deleted: { at: null },
+            updated: { at: nowDate },
+          },
+          aggs: {
+            tested: {
+              key: { kt: 'test', pk: '9-9-9-9-9' },
+              hello: 'world',
+            } as any
+          }
+        };
+        const query: ItemQuery =
+          IQFactory.agg('tested',
+            IQFactory.conditions([{ column: 'hello', value: "world", operator: '==' }]).toQuery()).toQuery();
+        expect(isQueryMatch(oneAggItem, query)).toBe(true);
       });
     });
 

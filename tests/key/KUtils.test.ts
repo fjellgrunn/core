@@ -732,13 +732,13 @@ describe('KUtils', () => {
       it('should return null when first key is null', () => {
         const a: PriKey<'typeA'> | null = null;
         const b: PriKey<'typeA'> = { pk: '123', kt: 'typeA' };
-        expect(isPriKeyEqualNormalized(a as any, b)).toBe(null);
+        expect(isPriKeyEqualNormalized(a as any, b)).toBe(false);
       });
 
       it('should return null when second key is null', () => {
         const a: PriKey<'typeA'> = { pk: '123', kt: 'typeA' };
         const b: PriKey<'typeA'> | null = null;
-        expect(isPriKeyEqualNormalized(a, b as any)).toBe(null);
+        expect(isPriKeyEqualNormalized(a, b as any)).toBe(false);
       });
     });
 
@@ -776,13 +776,13 @@ describe('KUtils', () => {
       it('should return null when first key is null', () => {
         const a: LocKey<'typeA'> | null = null;
         const b: LocKey<'typeA'> = { lk: '123', kt: 'typeA' };
-        expect(isLocKeyEqualNormalized(a as any, b)).toBe(null);
+        expect(isLocKeyEqualNormalized(a as any, b)).toBe(false);
       });
 
       it('should return null when second key is null', () => {
         const a: LocKey<'typeA'> = { lk: '123', kt: 'typeA' };
         const b: LocKey<'typeA'> | null = null;
-        expect(isLocKeyEqualNormalized(a, b as any)).toBe(null);
+        expect(isLocKeyEqualNormalized(a, b as any)).toBe(false);
       });
     });
 

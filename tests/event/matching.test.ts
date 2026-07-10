@@ -120,6 +120,12 @@ describe('event/matching', () => {
     it('rejects when types differ (PriKey vs ComKey)', () => {
       expect(doesKeyMatch(priKey('p1'), comKey('p1', [{ kt: 'store', lk: 's1' }]))).toBe(false);
     });
+    it('matches PriKeys with mixed string/number pk', () => {
+      expect(doesKeyMatch(
+        { kt: 'product', pk: '123' } as any,
+        { kt: 'product', pk: 123 } as any,
+      )).toBe(true);
+    });
   });
 
   describe('doesKeyMatchLocation', () => {

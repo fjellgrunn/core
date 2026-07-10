@@ -1,7 +1,7 @@
 {
   "name": "@fjell/core",
   "description": "Core Item and Key Framework for Fjell",
-  "version": "4.4.80-dev.0",
+  "version": "4.4.80",
   "keywords": [
     "core",
     "fjell"
@@ -36,27 +36,27 @@
     "docs:test": "cd docs && npm run test"
   },
   "dependencies": {
-    "@fjell/logging": "^4.4.72",
-    "@fjell/types": "^4.4.9",
-    "@fjell/validation": "^4.4.6",
+    "@fjell/logging": "^4.4.73",
+    "@fjell/types": "^4.4.10",
+    "@fjell/validation": "^4.4.7",
     "deepmerge": "^4.3.1",
     "luxon": "^3.7.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.39.1",
-    "@fjell/common-config": "^1.1.38",
-    "@swc/core": "^1.15.2",
+    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/js": "^9.39.4",
+    "@fjell/common-config": "^1.1.41",
+    "@swc/core": "^1.15.43",
     "@tsconfig/recommended": "^1.0.13",
-    "@types/luxon": "^3.7.1",
-    "@typescript-eslint/eslint-plugin": "^8.46.4",
-    "@typescript-eslint/parser": "^8.46.4",
-    "@vitest/coverage-v8": "4.0.9",
-    "concurrently": "^9.2.1",
-    "esbuild": "0.25.11",
-    "eslint": "^9.38.0",
+    "@types/luxon": "^3.7.2",
+    "@typescript-eslint/eslint-plugin": "^8.63.0",
+    "@typescript-eslint/parser": "^8.63.0",
+    "@vitest/coverage-v8": "4.1.10",
+    "concurrently": "^9.2.3",
+    "esbuild": "0.28.1",
+    "eslint": "^9.39.4",
     "typescript": "^5.9.3",
-    "vitest": "4.0.9"
+    "vitest": "4.1.10"
   },
   "repository": {
     "type": "git",

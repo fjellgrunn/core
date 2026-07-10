@@ -64,9 +64,9 @@ export const isPriKeyEqualNormalized = <
   S extends string,
 >(a: PriKey<S>, b: PriKey<S>): boolean => {
   logger.trace('isPriKeyEqualNormalized', { a, b });
-  return a && b &&
+  return !!(a && b &&
     normalizeKeyValue(a.pk) === normalizeKeyValue(b.pk) &&
-    a.kt === b.kt;
+    a.kt === b.kt);
 };
 
 export const isLocKeyEqualNormalized = <
@@ -77,9 +77,9 @@ export const isLocKeyEqualNormalized = <
   L5 extends string = never
 >(a: LocKey<L1 | L2 | L3 | L4 | L5>, b: LocKey<L1 | L2 | L3 | L4 | L5>): boolean => {
   logger.trace('isLocKeyEqualNormalized', { a, b });
-  return a && b &&
+  return !!(a && b &&
     normalizeKeyValue(a.lk) === normalizeKeyValue(b.lk) &&
-    a.kt === b.kt;
+    a.kt === b.kt);
 };
 
 export const isComKeyEqualNormalized = <
