@@ -1,5 +1,5 @@
 import { ComKey, CompoundCondition, Condition, EventQuery, isCondition, Item, ItemQuery, OrderBy, PriKey, QueryParams, Reference, ReferenceItem, References } from "@fjell/types";
-import { isItemKeyEqual, isPriKey } from "../key/KUtils";
+import { isItemKeyEqualNormalized, isPriKey } from "../key/KUtils";
 import LibLogger from "../logger";
 import * as luxon from 'luxon';
 
@@ -31,10 +31,10 @@ export const queryToParams = (query: ItemQuery): QueryParams => {
   if (query.refs) {
     params.refs = JSON.stringify(query.refs);
   }
-  if (query.limit) {
+  if (typeof query.limit === 'number') {
     params.limit = query.limit;
   }
-  if (query.offset) {
+  if (typeof query.offset === 'number') {
     params.offset = query.offset;
   }
   if (query.aggs) {
@@ -74,10 +74,10 @@ export const paramsToQuery = (params: QueryParams): ItemQuery => {
   if (params.refs) {
     query.refs = JSON.parse(params.refs as string) as References;
   }
-  if (params.limit) {
+  if (params.limit != null && params.limit !== '') {
     query.limit = Number(params.limit);
   }
-  if (params.offset) {
+  if (params.offset != null && params.offset !== '') {
     query.offset = Number(params.offset);
   }
   if (params.aggs) {
@@ -110,7 +110,7 @@ const isRefQueryMatch =
     if (!references[refKey]) {
       return false;
     }
-    return isItemKeyEqual(queryRef, references[refKey].key);
+    return isItemKeyEqualNormalized(queryRef, references[refKey].key);
   }
 
 const isCompoundConditionQueryMatch = <
@@ -225,10 +225,11 @@ const isAggQueryMatch = <
     aggQuery: ItemQuery,
     agg: ReferenceItem<S, L1, L2, L3, L4, L5>
   ): boolean => {
-  const aggItem = agg.item;
+  // Aggregations are flattened ({ key, ...itemProps }). Legacy wrappers used { key, item }.
+  const legacyItem = (agg as { item?: Item<S, L1, L2, L3, L4, L5> }).item;
+  const aggItem = (legacyItem ?? agg) as Item<S, L1, L2, L3, L4, L5>;
   logger.debug('Comparing Agg', { aggKey, aggItem, aggQuery });
-  // Fancy, right?  This is a recursive call to isQueryMatch
-  if (!aggItem) {
+  if (!aggItem || !aggItem.key) {
     return false;
   }
   return isQueryMatch(aggItem, aggQuery);
@@ -295,18 +296,21 @@ export const isQueryMatch = <
   if (query.events && item.events) {
     for (const key in query.events) {
       const queryEvent = query.events[key];
-      if (!isEventQueryMatch(key, queryEvent, item)) return false
+      if (!isEventQueryMatch(key, queryEvent, item)) return false;
     }
-    return true;
+  } else if (query.events && !item.events) {
+    logger.debug('Query contains events but item does not have events', { query, item });
+    return false;
   }
 
   if (query.aggs && item.aggs) {
     for (const key in query.aggs) {
       const aggQuery = query.aggs[key];
-      // aggs is a record where each key maps to an array of aggregations
+      // aggs may be an array (cardinality many) or a single flattened object (cardinality one)
       if (item.aggs[key]) {
+        const aggRecords = Array.isArray(item.aggs[key]) ? item.aggs[key] : [item.aggs[key]];
         let hasMatch = false;
-        for (const aggRecord of item.aggs[key]) {
+        for (const aggRecord of aggRecords) {
           if (isAggQueryMatch(key, aggQuery, aggRecord as ReferenceItem<any, any, any, any, any, any>)) {
             hasMatch = true;
             break;

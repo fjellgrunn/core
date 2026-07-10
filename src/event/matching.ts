@@ -1,5 +1,5 @@
 import { ComKey, ItemTypeArray, LocKeyArray, PriKey } from '@fjell/types';
-import { isComKey, isPriKey } from '../key/KUtils';
+import { isComKey, isItemKeyEqualNormalized, isPriKey } from '../key/KUtils';
 import { BaseEvent } from './events';
 import { isItemSubscription, isLocationSubscription, Subscription } from './subscription';
 
@@ -95,33 +95,8 @@ export function doesKeyMatch<
   eventKey: PriKey<S> | ComKey<S, L1, L2, L3, L4, L5>,
   subscriptionKey: PriKey<S> | ComKey<S, L1, L2, L3, L4, L5>
 ): boolean {
-  // Both must be the same type (PriKey or ComKey)
-  if (isPriKey(eventKey) && isPriKey(subscriptionKey)) {
-    return eventKey.pk === subscriptionKey.pk && eventKey.kt === subscriptionKey.kt;
-  }
-
-  if (isComKey(eventKey) && isComKey(subscriptionKey)) {
-    const eventComKey = eventKey as ComKey<S, L1, L2, L3, L4, L5>;
-    const subscriptionComKey = subscriptionKey as ComKey<S, L1, L2, L3, L4, L5>;
-    
-    // Compare primary key and key type
-    if (eventComKey.pk !== subscriptionComKey.pk || eventComKey.kt !== subscriptionComKey.kt) {
-      return false;
-    }
-
-    // Compare location arrays
-    if (eventComKey.loc.length !== subscriptionComKey.loc.length) {
-      return false;
-    }
-
-    // Check each location key
-    return eventComKey.loc.every((eventLocKey, index) => {
-      const subLocKey = subscriptionComKey.loc[index];
-      return eventLocKey.lk === subLocKey.lk && eventLocKey.kt === subLocKey.kt;
-    });
-  }
-
-  return false; // Different key types don't match
+  // Normalize string/number pk/lk so JSON/Sequelize boundaries still match
+  return isItemKeyEqualNormalized(eventKey, subscriptionKey);
 }
 
 /**

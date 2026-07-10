@@ -24,7 +24,7 @@ export class IFactory<
     if (!this.item.refs) {
       this.item.refs = {};
     }
-    this.item.refs[refName] = ik;
+    this.item.refs[refName] = { key: ik };
     return this;
   }
 

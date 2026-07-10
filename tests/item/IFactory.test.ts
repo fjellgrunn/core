@@ -24,13 +24,13 @@ describe('Testing IFactory', () => {
 
   test('Event with an unnamed Reference', () => {
     const iFactory = IFactory.addRef(profile);
-    const expected = { refs: { profile: { kt: 'profile', pk: '1-1-1-1-1' } } }
+    const expected = { refs: { profile: { key: { kt: 'profile', pk: '1-1-1-1-1' } } } }
     expect(iFactory.toItem()).toStrictEqual(expected);
   });
 
   test('Event with a named Reference', () => {
     const iFactory = IFactory.addRef(profile, 'creator');
-    const expected = { refs: { creator: { kt: 'profile', pk: '1-1-1-1-1' } } }
+    const expected = { refs: { creator: { key: { kt: 'profile', pk: '1-1-1-1-1' } } } }
     expect(iFactory.toItem()).toStrictEqual(expected);
   });
 
