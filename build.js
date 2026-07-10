@@ -1,7 +1,17 @@
 import { build } from 'esbuild';
 import { execSync } from 'child_process';
 
-// Generate TypeScript declarations first
+// Type-check first — fail fast on type errors before emitting declarations
+console.log('Running TypeScript type check...');
+try {
+  execSync('npx tsc --noEmit', { stdio: 'inherit' });
+  console.log('TypeScript type check passed!');
+} catch (error) {
+  console.error('TypeScript type check failed:', error.message);
+  process.exit(1);
+}
+
+// Generate TypeScript declarations
 console.log('Generating TypeScript declarations...');
 try {
   execSync('npx tsc --emitDeclarationOnly', { stdio: 'inherit' });
